@@ -3,12 +3,12 @@ package main
 import (
 	"net/http"
 
-	api "github.com/krutip7/chat-app-server/cmd/api/models"
+	"github.com/krutip7/chat-app-server/cmd/api/models"
 	"github.com/krutip7/chat-app-server/cmd/api/utils"
 )
 
 func (app *Application) HealthCheck(response http.ResponseWriter, request *http.Request) {
-	payload := api.HealthCheckResponse{
+	payload := models.HealthStatus{
 		Status:  "success",
 		Message: "Chat App Backend Server is up and running",
 		Version: app.version,

@@ -1,6 +1,6 @@
 package models
 
-type HealthCheckResponse struct {
+type HealthStatus struct {
 	Status  string `json:"status"`
 	Message string `json:"message"`
 	Version string `json:"version"`
