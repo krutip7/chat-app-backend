@@ -4,10 +4,10 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"strings"
 
 	api "github.com/krutip7/chat-app-server/cmd/api/models"
 	"github.com/krutip7/chat-app-server/cmd/api/utils"
-	"github.com/krutip7/chat-app-server/internals/models"
 )
 
 func (app *Application) GetUser(response http.ResponseWriter, request *http.Request) {
@@ -31,24 +31,33 @@ func (app *Application) Redirect(w http.ResponseWriter, r *http.Request) {
 
 func (app *Application) Authenticate(response http.ResponseWriter, request *http.Request) {
 
-	// TODO: Verify user credentials and fetch details from DB
-	user := models.User{
-		Id:        "1",
-		FirstName: "John",
-		LastName:  "Doe",
-		Username:  "johndoe",
+	payload := api.LoginRequest{}
+
+	err := utils.ReadJSONRequest(response, request, payload)
+	if err != nil {
+		utils.WriteJSONErrorResponse(response, err, http.StatusBadRequest)
+		return
 	}
 
-	tokenPair, err := app.auth.GenerateJWTToken(&user)
+	InvalidUserCredentials := errors.New("invalid credentials")
+
+	user, err := app.repo.userRepo.GetUserByEmail(strings.ToLower(payload.Email))
+	if err != nil {
+		utils.WriteJSONErrorResponse(response, InvalidUserCredentials, http.StatusBadRequest)
+	}
+
+	
+
+	tokenPair, err := app.auth.GenerateJWTToken(user)
 	if err != nil {
 		log.Println(err)
 		utils.WriteJSONErrorResponse(response, errors.New("token generation failed"), http.StatusInternalServerError)
 		return
 	}
 
-	data := api.PostLogin{
+	data := api.PostLoginResponse{
 		Token: tokenPair.AuthToken,
-		User:  user,
+		User:  *user,
 	}
 
 	refreshTokenCookie := app.auth.GetRefreshTokenCookie(tokenPair.RefreshToken)
