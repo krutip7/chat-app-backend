@@ -50,5 +50,9 @@ func (app *Application) Authenticate(response http.ResponseWriter, request *http
 		Token: tokenPair.AuthToken,
 		User:  user,
 	}
+
+	refreshTokenCookie := app.auth.GetRefreshTokenCookie(tokenPair.RefreshToken)
+	http.SetCookie(response, refreshTokenCookie)
+
 	utils.WriteJSONResponse(response, data)
 }

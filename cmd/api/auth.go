@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -14,6 +15,7 @@ type Auth struct {
 	AuthTokenValidity    time.Duration
 	RefreshTokenValidity time.Duration
 	SigningKey           []byte
+	CookieName           string
 }
 
 type TokenPair struct {
@@ -33,7 +35,6 @@ func (auth *Auth) GenerateJWTToken(user *models.User) (tokenPair TokenPair, err 
 		name:     fmt.Sprintf("%s %s", user.FirstName, user.LastName),
 		username: user.Username,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ID:        "",
 			Issuer:    auth.Issuer,
 			Subject:   user.Id,
 			Audience:  jwt.ClaimStrings{auth.Audience},
@@ -49,7 +50,6 @@ func (auth *Auth) GenerateJWTToken(user *models.User) (tokenPair TokenPair, err 
 	}
 
 	refreshTokenClaims := jwt.RegisteredClaims{
-		ID:        "",
 		Issuer:    auth.Issuer,
 		Subject:   user.Id,
 		Audience:  jwt.ClaimStrings{auth.Audience},
@@ -66,4 +66,16 @@ func (auth *Auth) GenerateJWTToken(user *models.User) (tokenPair TokenPair, err 
 	}
 
 	return
+}
+
+func (auth *Auth) GetRefreshTokenCookie(refreshToken string) *http.Cookie {
+	return &http.Cookie{
+		Name:     auth.CookieName,
+		Value:    refreshToken,
+		MaxAge:   int(auth.RefreshTokenValidity.Seconds()),
+		Expires:  time.Now().UTC().Add(auth.RefreshTokenValidity),
+		SameSite: http.SameSiteStrictMode,
+		Secure:   true,
+		HttpOnly: true,
+	}
 }
