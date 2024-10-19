@@ -79,3 +79,15 @@ func (auth *Auth) GetRefreshTokenCookie(refreshToken string) *http.Cookie {
 		HttpOnly: true,
 	}
 }
+
+func (auth *Auth) ClearRefreshTokenCookie() *http.Cookie {
+	return &http.Cookie{
+		Name:     auth.CookieName,
+		Value:    "",
+		MaxAge:   -1,
+		Expires:  time.Unix(0, 0),
+		SameSite: http.SameSiteStrictMode,
+		Secure:   true,
+		HttpOnly: true,
+	}
+}

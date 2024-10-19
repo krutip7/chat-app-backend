@@ -53,3 +53,9 @@ func (app *Application) Authenticate(response http.ResponseWriter, request *http
 
 	utils.WriteJSONResponse(response, data)
 }
+
+func (app *Application) Logout(response http.ResponseWriter, request *http.Request) {
+	expiredRefreshCookie := app.auth.ClearRefreshTokenCookie()
+	http.SetCookie(response, expiredRefreshCookie)
+	utils.WriteJSONResponse(response, nil)
+}

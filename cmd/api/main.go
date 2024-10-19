@@ -23,7 +23,7 @@ func main() {
 		Audience:             app.domain,
 		AuthTokenValidity:    15 * time.Minute,
 		RefreshTokenValidity: 24 * time.Hour,
-		CookieName:           "refresh_token",
+		CookieName:           "__Host-refresh_token",
 	}
 
 	// Init Command Flags
