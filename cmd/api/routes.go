@@ -9,6 +9,8 @@ func (app *Application) routes() http.Handler {
 
 	router.HandleFunc("POST /authenticate", app.Authenticate)
 
+	router.HandleFunc("/refresh", app.RefreshCookie)
+
 	router.HandleFunc("/logout", app.Logout)
 
 	router.HandleFunc("/health-check", app.HealthCheck)
