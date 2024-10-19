@@ -6,12 +6,14 @@ import (
 )
 
 type Application struct {
-	domain  string
-	port    int
-	version string
-	dsn     string
-	db      *sqlx.DB
-	repo    Repository
+	domain    string
+	port      int
+	version   string
+	dsn       string
+	db        *sqlx.DB
+	repo      Repository
+	auth      *Auth
+	jwtSecret string
 }
 
 type Repository struct {
