@@ -35,7 +35,7 @@ func (userRepo *UserRepository) GetUserByEmail(email string) (*models.User, erro
 
 	var users []models.User
 
-	query := `SELECT id, first_name, last_name, email FROM users WHERE email=$1`
+	query := `SELECT id, first_name, last_name, email, password FROM users WHERE email=$1`
 
 	err := userRepo.DB.SelectContext(ctx, &users, query, email)
 	if err != nil {

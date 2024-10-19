@@ -33,7 +33,7 @@ func (app *Application) Authenticate(response http.ResponseWriter, request *http
 
 	payload := api.LoginRequest{}
 
-	err := utils.ReadJSONRequest(response, request, payload)
+	err := utils.ReadJSONRequest(response, request, &payload)
 	if err != nil {
 		utils.WriteJSONErrorResponse(response, err, http.StatusBadRequest)
 		return
@@ -46,7 +46,14 @@ func (app *Application) Authenticate(response http.ResponseWriter, request *http
 		utils.WriteJSONErrorResponse(response, InvalidUserCredentials, http.StatusBadRequest)
 	}
 
-	
+	valid, err := user.VerifyPassword(payload.Password)
+	if err != nil {
+		utils.WriteJSONErrorResponse(response, err, http.StatusInternalServerError)
+		return
+	} else if !valid {
+		utils.WriteJSONErrorResponse(response, InvalidUserCredentials, http.StatusBadRequest)
+		return
+	}
 
 	tokenPair, err := app.auth.GenerateJWTToken(user)
 	if err != nil {
