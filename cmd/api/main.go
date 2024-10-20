@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/krutip7/chat-app-server/cmd/api/auth"
 	"github.com/krutip7/chat-app-server/cmd/api/middleware"
 )
 
@@ -20,7 +21,7 @@ func main() {
 		version: "1.0.0",
 	}
 
-	app.auth = &Auth{
+	app.auth = &auth.Auth{
 		Issuer:               app.domain,
 		Audience:             app.domain,
 		AuthTokenValidity:    15 * time.Minute,

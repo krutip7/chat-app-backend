@@ -1,4 +1,4 @@
-package repository
+package postgres
 
 import (
 	"time"
@@ -10,7 +10,7 @@ import (
 
 var defaultQueryTimeout = time.Second * 3
 
-func InitPostgresDB(dsn string) (*sqlx.DB, error) {
+func Connect(dsn string) (*sqlx.DB, error) {
 	db, err := sqlx.Open("pgx", dsn)
 	if err != nil {
 		return nil, err
