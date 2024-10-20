@@ -59,7 +59,7 @@ func (app *Application) Authenticate(response http.ResponseWriter, request *http
 
 func (app *Application) RefreshCookie(response http.ResponseWriter, request *http.Request) {
 
-	var claims jwt.Claims
+	var claims jwt.RegisteredClaims
 	var refreshToken string
 	for _, cookie := range request.Cookies() {
 		if cookie.Name == app.auth.CookieName {
@@ -69,32 +69,37 @@ func (app *Application) RefreshCookie(response http.ResponseWriter, request *htt
 
 	UnauthorizedUser := errors.New("unauthorized user")
 
-	oldToken, err := jwt.ParseWithClaims(refreshToken, claims, func(_ *jwt.Token) (any, error) { return app.jwtSecret, nil })
+	oldToken, err := jwt.ParseWithClaims(refreshToken, &claims, func(_ *jwt.Token) (any, error) { return app.auth.SigningKey, nil })
 	if err != nil {
+		log.Println(err)
 		utils.WriteJSONErrorResponse(response, UnauthorizedUser, http.StatusUnauthorized)
 		return
 	}
 
 	sub, err := oldToken.Claims.GetSubject()
 	if err != nil {
+		log.Println(err)
 		utils.WriteJSONErrorResponse(response, UnauthorizedUser, http.StatusUnauthorized)
 		return
 	}
 
 	userId, err := strconv.Atoi(sub)
 	if err != nil {
+		log.Println(err)
 		utils.WriteJSONErrorResponse(response, UnauthorizedUser, http.StatusUnauthorized)
 		return
 	}
 
 	user, err := app.repo.userRepo.GetUserById(userId)
 	if err != nil {
+		log.Println(err)
 		utils.WriteJSONErrorResponse(response, UnauthorizedUser, http.StatusUnauthorized)
 		return
 	}
 
 	tokenPair, err := app.auth.GenerateJWTToken(user)
 	if err != nil {
+		log.Println(err)
 		utils.WriteJSONErrorResponse(response, err, http.StatusInternalServerError)
 		return
 	}

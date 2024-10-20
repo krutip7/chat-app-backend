@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -90,4 +91,21 @@ func (auth *Auth) ClearRefreshTokenCookie() *http.Cookie {
 		Secure:   true,
 		HttpOnly: true,
 	}
+}
+
+func (auth *Auth) VerifyJWT(tokenString string) (*jwt.Token, error) {
+	var claims JWTClaims
+
+	authToken, err := jwt.ParseWithClaims(tokenString, &claims, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("invalid signing method")
+		}
+		return auth.SigningKey, nil
+	})
+
+	if err != nil {
+		return nil, errors.New("invalid auth token")
+	}
+
+	return authToken, nil
 }
