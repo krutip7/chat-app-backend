@@ -6,6 +6,7 @@ import (
 )
 
 func EnableCORS(handler http.Handler) http.Handler {
+
 	return http.HandlerFunc(func(response http.ResponseWriter, request *http.Request) {
 
 		response.Header().Set("Access-Control-Allow-Origin", os.Getenv("ALLOW_ORIGIN"))
