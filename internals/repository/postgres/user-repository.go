@@ -1,7 +1,8 @@
-package repository
+package postgres
 
 import (
 	"context"
+	"errors"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/krutip7/chat-app-server/internals/models"
@@ -40,6 +41,8 @@ func (userRepo *UserRepository) GetUserByEmail(email string) (*models.User, erro
 	err := userRepo.DB.SelectContext(ctx, &users, query, email)
 	if err != nil {
 		return nil, err
+	} else if len(users) < 1 {
+		return nil, errors.New("user not found")
 	}
 
 	return &users[0], nil

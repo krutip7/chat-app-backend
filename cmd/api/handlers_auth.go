@@ -25,8 +25,9 @@ func (app *Application) Authenticate(response http.ResponseWriter, request *http
 	InvalidUserCredentials := errors.New("invalid credentials")
 
 	user, err := app.repo.userRepo.GetUserByEmail(strings.ToLower(payload.Email))
-	if err != nil {
+	if err != nil || user == nil {
 		utils.WriteJSONErrorResponse(response, InvalidUserCredentials, http.StatusBadRequest)
+		return
 	}
 
 	valid, err := user.VerifyPassword(payload.Password)
