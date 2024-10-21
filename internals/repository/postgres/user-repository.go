@@ -47,3 +47,20 @@ func (userRepo *UserRepository) GetUserByEmail(email string) (*models.User, erro
 
 	return &users[0], nil
 }
+
+func (userRepo *UserRepository) GetAllUsers() ([]models.User, error) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), defaultQueryTimeout)
+	defer cancel()
+
+	var users []models.User
+
+	query := `SELECT id, first_name, last_name, email, username FROM users`
+
+	err := userRepo.DB.SelectContext(ctx, &users, query)
+	if err != nil {
+		return nil, err
+	}
+
+	return users, nil
+}

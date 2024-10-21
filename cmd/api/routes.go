@@ -43,7 +43,7 @@ func configureBaseRouter(app *Application) *http.ServeMux {
 func configureInternalRouter(app *Application) http.Handler {
 	router := http.NewServeMux()
 
-	router.HandleFunc("/user-auth", app.GetUser)
+	router.HandleFunc("GET /users", app.GetUsers)
 
 	return router
 }
