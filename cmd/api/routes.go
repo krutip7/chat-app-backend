@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/krutip7/chat-app-server/cmd/api/middleware"
+	"github.com/krutip7/chat-app-server/cmd/api/sockethub"
 )
 
 func (app *Application) routes() http.Handler {
@@ -26,6 +27,10 @@ func (app *Application) routes() http.Handler {
 
 func configureBaseRouter(app *Application) *http.ServeMux {
 	router := http.NewServeMux()
+
+	socketHandler := sockethub.NewWebSocketHandler(app.auth)
+
+	router.HandleFunc("/ws", socketHandler.HandleConnection)
 
 	router.HandleFunc("/user", app.GetUser)
 
