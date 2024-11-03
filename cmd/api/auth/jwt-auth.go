@@ -25,16 +25,16 @@ type TokenPair struct {
 }
 
 type JWTClaims struct {
-	name     string
-	username string
+	Name     string
+	Username string
 	jwt.RegisteredClaims
 }
 
 func (auth *Auth) GenerateJWTToken(user *models.User) (tokenPair TokenPair, err error) {
 
 	authTokenClaims := JWTClaims{
-		name:     fmt.Sprintf("%s %s", user.FirstName, user.LastName),
-		username: user.Username,
+		Name:     fmt.Sprintf("%s %s", user.FirstName, user.LastName),
+		Username: user.Username,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    auth.Issuer,
 			Subject:   user.Id,
@@ -93,10 +93,10 @@ func (auth *Auth) ClearRefreshTokenCookie() *http.Cookie {
 	}
 }
 
-func (auth *Auth) VerifyJWT(tokenString string) (*jwt.Token, error) {
+func (auth *Auth) VerifyJWT(tokenString string) (JWTClaims, error) {
 	var claims JWTClaims
 
-	authToken, err := jwt.ParseWithClaims(tokenString, &claims, func(token *jwt.Token) (interface{}, error) {
+	_, err := jwt.ParseWithClaims(tokenString, &claims, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("invalid signing method")
 		}
@@ -104,8 +104,8 @@ func (auth *Auth) VerifyJWT(tokenString string) (*jwt.Token, error) {
 	})
 
 	if err != nil {
-		return nil, errors.New("invalid auth token")
+		return claims, errors.New("invalid auth token")
 	}
 
-	return authToken, nil
+	return claims, nil
 }
